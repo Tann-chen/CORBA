@@ -5,7 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-
+import DCMS.CenterServer;
 import thread.MyThread;
 
 

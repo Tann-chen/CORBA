@@ -1,7 +1,7 @@
 package client;
 
 
-import servers.CenterServer;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -11,11 +11,12 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Date;
 
+
 public class Manager {
 	private String managerID;
 	private String name;
 	private Registry registry;
-	private CenterServer centerServer;
+
 	private static File loggingFile=new File("Manager.txt");
 
 	public Manager(String managerID, String name, String[] args){
@@ -42,7 +43,7 @@ public class Manager {
 		}
 		try {
 			registry = LocateRegistry.getRegistry(port);
-			centerServer= (CenterServer) registry.lookup(portName);
+
 		}catch (Exception e){
 			e.getStackTrace();
 		}
