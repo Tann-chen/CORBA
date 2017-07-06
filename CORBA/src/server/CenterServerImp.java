@@ -1,10 +1,10 @@
 package server;
 
 import DCMS.CenterServerPOA;
+import org.omg.CORBA.ORB;
 import records.Record;
 import records.StudentRecord;
 import records.TeacherRecord;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -15,12 +15,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.Semaphore;
 
+
 public class CenterServerImp extends CenterServerPOA{
 
     private HashMap<Character,ArrayList<Record>> storedRecords = new HashMap<>();
     private File loggingFile;
     private String centerName;
     private Semaphore mutex=new Semaphore(1,true);
+    private ORB orb;
+
 
 
     public CenterServerImp(File loggingFile,String centerName){
@@ -28,6 +31,9 @@ public class CenterServerImp extends CenterServerPOA{
         this.centerName=centerName;
     }
 
+    public void setORB(ORB orb_val){
+        orb = orb_val;
+    }
 
     @Override
     public boolean createTRecord(String managerId, String firstName, String lastName, String address, String phone, String specialization, String location) {
@@ -133,6 +139,7 @@ public class CenterServerImp extends CenterServerPOA{
             ie.printStackTrace();
         }
     }
+
 
 
 }
