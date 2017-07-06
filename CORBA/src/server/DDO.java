@@ -42,7 +42,7 @@ public class DDO {
 		      // get the root naming context
 		      // NameService invokes the name service
 		      org.omg.CORBA.Object objRef =
-		          orb.resolve_initial_references("NameService");
+		          orb.resolve_initial_references("DDO");
 		      // Use NamingContextExt which is part of the Interoperable
 		      // Naming Service (INS) specification.
 		      NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
