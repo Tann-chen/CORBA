@@ -18,7 +18,7 @@ public class Manager {
 	private CenterServer centerServer;
 	private static File loggingFile=new File("Manager.txt");
 
-	public Manager(String managerID, String name){
+	public Manager(String managerID, String name, String[] args){
 		this.managerID = managerID;
 		this.name = name;
 		//distributing server
