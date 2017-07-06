@@ -1,7 +1,7 @@
 package client;
 
 
-import servers.CenterServer;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -11,15 +11,17 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Date;
 
+
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
+
 
 public class Manager {
 	private String managerID;
 	private String name;
 	private Registry registry;
-	private CenterServer centerServer;
+
 	private static File loggingFile=new File("Manager.txt");
 
 	public Manager(String managerID, String name, String[] args){
@@ -41,6 +43,7 @@ public class Manager {
 			System.out.println("Error:invalid managerID");
 			return;
 		}
+
 		try{
 	        // create and initialize the ORB
 	        ORB orb = ORB.init(args, null);
