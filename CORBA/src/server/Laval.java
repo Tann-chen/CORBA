@@ -1,8 +1,7 @@
 package server;
 
 import java.io.File;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
+
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NameComponent;
 import org.omg.CosNaming.NamingContextExt;
@@ -11,16 +10,17 @@ import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 import DCMS.CenterServer;
 import DCMS.CenterServerHelper;
-import thread.MyThread;
+import thread.UdpListener;
 
 public class Laval {
 	private static CenterServerImp centerServerSurvant;
+	private static File logFile;
 
 	public static void main(String[] args){
 
 		try{
-			File logFile =new File("lvl.txt");
-
+			// setup the logging file
+			logFile =new File("lvl.txt");
 			// create and initialize the ORB
 			ORB orb = ORB.init(args, null);
 			// get reference to rootpoa & activate the POAManager
@@ -42,6 +42,8 @@ public class Laval {
 			String name = "LVL";
 			NameComponent path[] = ncRef.to_name(name);
 			ncRef.rebind(path, href);
+			//create a new thread to listen udp requests between servers
+			new UdpListener(centerServerSurvant).start();
 			System.out.println("LVLServer ready and waiting ...");
 			// wait for invocations from clients
 			orb.run();
@@ -51,30 +53,7 @@ public class Laval {
 			e.printStackTrace(System.out);
 		}
 
-		/*
-		Registry registry = LocateRegistry.createRegistry(3001);
-		registry.bind("LVLCenter", centerServer);
-		System.out.println("LVL start");
-		//listening to request
-		DatagramSocket datagramSocket = null;
-		//create socket
-		try {
-			datagramSocket = new DatagramSocket(6790);
-			byte[] buffer = new byte[1000];
-			//listening
-			System.out.println("LVL start listening");
-			while(true){
-				DatagramPacket request = new DatagramPacket(buffer, buffer.length);
-				datagramSocket.receive(request);
-				new MyThread(request.getAddress(),request.getPort(),datagramSocket,centerServer).start();
-			}
-			
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}finally {
-			if(datagramSocket != null)
-				datagramSocket.close();
-		}
-		*/
+		//when client shutdown the CenterServer,orb stops waiting, and output
+		System.out.println("Laval Server Exiting ...");
 	}
 }

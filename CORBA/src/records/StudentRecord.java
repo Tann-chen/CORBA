@@ -18,15 +18,8 @@ public class StudentRecord extends Record implements Serializable{
 		this.date = date;
 	}
 
-	@Override
-	public String toString() {
-		return "StudentRecord [coursesRegistered=" + coursesRegistered + ", status=" + status + ", date=" + date
-				+ ", recordID=" + recordID + ", firstName=" + firstName + ", lastName=" + lastName + "]";
-	}
-
 	public boolean setValue(String fieldName, String value){
-
-		 if(fieldName.equalsIgnoreCase("status")){
+		if(fieldName.equalsIgnoreCase("status")){
 			if(value.equals("active")||value.equals("inactive")){
 				this.status=value;
 				return true;
@@ -45,4 +38,9 @@ public class StudentRecord extends Record implements Serializable{
 		 else return false;
 	}
 
+	@Override
+	public String toString() {
+		return "StudentRecord [coursesRegistered=" + coursesRegistered + ", status=" + status + ", date=" + date
+				+ ", recordID=" + recordID + ", firstName=" + firstName + ", lastName=" + lastName + "]";
+	}
 }

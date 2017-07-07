@@ -1,29 +1,25 @@
 package server;
 
 import java.io.File;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import thread.MyThread;
+
 import org.omg.CosNaming.*;
-import org.omg.CosNaming.NamingContextPackage.*;
 import org.omg.CORBA.*;
 import org.omg.PortableServer.*;
 import org.omg.PortableServer.POA;
 import DCMS.CenterServer;
 import DCMS.CenterServerHelper;
-
+import thread.UdpListener;
 
 
 public class DDO {
 	private static CenterServerImp centerServerSurvant;
+	private static File logFile;
 
 	public static void main(String[] args){
 
 		try{
-			File logFile = new File("ddo.txt");
-
+			// setup the logging file
+			logFile = new File("ddo.txt");
 			// create and initialize the ORB
 			ORB orb = ORB.init(args, null);
 			// get reference to rootpoa & activate the POAManager
@@ -45,6 +41,8 @@ public class DDO {
 			String name = "DDO";
 			NameComponent path[] = ncRef.to_name(name);
 			ncRef.rebind(path, href);
+			//create a new thread to listen udp requests between servers
+			new UdpListener(centerServerSurvant).start();
 			System.out.println("DDOServer ready and waiting ...");
 			// wait for invocations from clients
 			orb.run();
@@ -54,31 +52,7 @@ public class DDO {
 			e.printStackTrace(System.out);
 		}
 
-
-		/*
-		Registry registry = LocateRegistry.createRegistry(3002);
-		registry.bind("DDOCenter", centerServer);
-		System.out.println("DDO start");
-		//listening to request
-		DatagramSocket datagramSocket = null;
-		try {
-			//create belonging socket
-			datagramSocket = new DatagramSocket(6789);
-			byte[] buffer = new byte[1000];
-			//listening
-			System.out.println("DDO start listening");
-			while(true){
-				DatagramPacket request = new DatagramPacket(buffer, buffer.length);
-				datagramSocket.receive(request);
-				new MyThread(request.getAddress(),request.getPort(),datagramSocket,centerServer).start();
-			}
-
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}finally {
-			if(datagramSocket != null)
-				datagramSocket.close();
-		}
-		*/
+		//when client shutdown the CenterServer,orb stops waiting, and output
+		System.out.println("DDO Server Exiting ...");
 	}
 }

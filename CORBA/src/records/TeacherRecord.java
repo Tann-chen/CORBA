@@ -8,7 +8,7 @@ public class TeacherRecord extends Record implements Serializable{
 	public String phone;
 	public String specialization;
 	public String location;
-	
+
 	public TeacherRecord(String firstName, String lastName, String address, String phone, String specialization,
 			String location) {
 		super(firstName,lastName);
@@ -20,7 +20,6 @@ public class TeacherRecord extends Record implements Serializable{
 	}
 
 	public boolean setValue(String fieldName, String value){
-
 		if(fieldName.equalsIgnoreCase("location")){
 			if(value.equals("mtl")||value.equals("lvl")||value.equals("ddo")){
 				this.location=value;
