@@ -2,7 +2,7 @@ package records;
 
 import java.io.Serializable;
 
-public class Record implements Serializable {
+public class Record implements Serializable{
 
 	public String recordID;
 	public String firstName;

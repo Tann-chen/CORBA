@@ -18,15 +18,15 @@ import java.util.concurrent.Semaphore;
 
 public class CenterServerImp extends CenterServerPOA{
 
-    private HashMap<Character,ArrayList<Record>> storedRecords = new HashMap<>();
+    public String centerName;
+    private HashMap<Character,ArrayList<Record>> storedRecords;
     private File loggingFile;
-    private String centerName;
-    private Semaphore mutex=new Semaphore(1,true);
     private ORB orb;
-
+    private Semaphore mutex=new Semaphore(1,true);
 
 
     public CenterServerImp(File loggingFile,String centerName){
+        storedRecords= new HashMap<Character,ArrayList<Record>>();
         this.loggingFile=loggingFile;
         this.centerName=centerName;
     }
@@ -35,14 +35,16 @@ public class CenterServerImp extends CenterServerPOA{
         orb = orb_val;
     }
 
+
+
     @Override
     public boolean createTRecord(String managerId, String firstName, String lastName, String address, String phone, String specialization, String location) {
         TeacherRecord teacherRecord = new TeacherRecord(firstName, lastName, address, phone, specialization, location);
         int beforeNum=getLocalRecordsCount();
         storingRecord(teacherRecord);
         int afterNum=getLocalRecordsCount();
-
-        String log=(new Date().toString()+"-"+managerId+" - creating a teacher record - "+teacherRecord.recordID);
+        //log
+        String log=(new Date().toString()+" - "+managerId+" - creating a teacher record - "+teacherRecord.recordID);
         writeLog(log);
         return beforeNum+1==afterNum;
     }
@@ -53,7 +55,7 @@ public class CenterServerImp extends CenterServerPOA{
         int beforeNum=getLocalRecordsCount();
         storingRecord(studentRecord);
         int afterNum=getLocalRecordsCount();
-        String log=(new Date().toString()+"-"+managerId+" - creating a student record - "+studentRecord.recordID);
+        String log=(new Date().toString()+" - "+managerId+" - creating a student record - "+studentRecord.recordID);
         writeLog(log);
         return beforeNum+1==afterNum;
     }
@@ -64,31 +66,32 @@ public class CenterServerImp extends CenterServerPOA{
     }
 
     @Override
-    public void editRecord(String managerId, String recordID, String fieldName, String newValue) {
+    public void editRecord(String managerId, String recordID, String fieldName, String newValue){
         Record targetRecord=null;
 
         Collection<ArrayList<Record>> arrayListsSet=storedRecords.values();
-        for(ArrayList<Record> recordArrayListSet :arrayListsSet){
+        for(ArrayList<Record> recordArrayListSet:arrayListsSet){
             for(Record record:recordArrayListSet){
                 if(record.recordID.equalsIgnoreCase(recordID))
                     targetRecord=record;
             }
         }
-
-        System.out.println(targetRecord);
-
         if(targetRecord!=null){
             if(targetRecord instanceof TeacherRecord){
-                ((TeacherRecord)targetRecord).setValue(fieldName,newValue);
+                synchronized (targetRecord) {
+                    ((TeacherRecord) targetRecord).setValue(fieldName, newValue);  //shared resource - synchronized
+                }
                 System.out.println(targetRecord);
             }
             else {
-                ((StudentRecord)targetRecord).setValue(fieldName,newValue);
+                synchronized (targetRecord) {
+                    ((StudentRecord) targetRecord).setValue(fieldName, newValue);   //shared resource - synchronized
+                }
                 System.out.println(targetRecord);
             }
         }
-
-        String log=(new Date().toString()+"-"+managerId+" - editing a record ");
+        //log
+        String log=(new Date().toString()+" - "+managerId+" - editing a record - "+recordID);
         writeLog(log);
     }
 
@@ -97,6 +100,8 @@ public class CenterServerImp extends CenterServerPOA{
 
     }
 
+    //synchronized method:if two storingRecord execute concurrently,in the situation when hashMap does not include the key
+    //the late put() will overlap the previous one -> previous record lost.
     private synchronized void storingRecord(Record record){
         char cap=record.lastName.charAt(0);
         if(!storedRecords.containsKey(cap)){
@@ -108,10 +113,9 @@ public class CenterServerImp extends CenterServerPOA{
             ArrayList<Record> theArray= storedRecords.get(cap);
             theArray.add(record);
         }
-
     }
 
-    public synchronized int getLocalRecordsCount(){
+    public int getLocalRecordsCount(){
         int count=0;
         Collection<ArrayList<Record>> arrayListsSet=storedRecords.values();
         for(ArrayList<Record> recordArrayListSet :arrayListsSet){
@@ -122,24 +126,21 @@ public class CenterServerImp extends CenterServerPOA{
         return count;
     }
 
+
     public void writeLog(String log){
         if(!loggingFile.exists())
             return;
         try {
             FileWriter fileWriter = new FileWriter(loggingFile, true);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            mutex.acquire();   //semaphore - lock
-            bufferedWriter.write(log);
-            bufferedWriter.newLine();
-            mutex.release();   //semaphore - unlock
+            //loggingFile is shared resource
+            synchronized (loggingFile) {
+                bufferedWriter.write(log);
+                bufferedWriter.newLine();
+            }
             bufferedWriter.close();
         }catch (IOException e){
             e.printStackTrace();
-        }catch (InterruptedException ie){
-            ie.printStackTrace();
         }
     }
-
-
-
 }
