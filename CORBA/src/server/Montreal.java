@@ -44,8 +44,9 @@ public class Montreal {
 			String name = "MTL";
 			NameComponent path[] = ncRef.to_name(name);
 			ncRef.rebind(path, href);
-			//create a new thread to listen udp requests between servers
-			new UdpListener(centerServerSurvant).start();
+			//define port number,create a new thread to listen udp requests between servers
+			int port=6791;
+			new UdpListener(centerServerSurvant,port).start();
 			System.out.println("MTLServer ready and waiting ...");
 			// wait for invocations from clients
 			orb.run();
