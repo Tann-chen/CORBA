@@ -9,6 +9,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -35,7 +38,10 @@ public class CenterServerImp extends CenterServerPOA{
         orb = orb_val;
     }
 
-
+    @Override
+    public void shutdown() {
+        this.orb.shutdown(false);
+    }
 
     @Override
     public boolean createTRecord(String managerId, String firstName, String lastName, String address, String phone, String specialization, String location) {
@@ -48,6 +54,7 @@ public class CenterServerImp extends CenterServerPOA{
         writeLog(log);
         return beforeNum+1==afterNum;
     }
+
 
     @Override
     public boolean createSRecord(String managerId, String firstName, String lastName, String coursesRegistered, String status, String date) {
@@ -62,11 +69,33 @@ public class CenterServerImp extends CenterServerPOA{
 
     @Override
     public String getRecordCounts(String managerId) {
-        return null;
+        String DDONum ;
+        String LVLNum ;
+        String MTLNum ;
+        if(centerName == "MTL"){
+            DDONum = messageForRecordCount(6789);
+            LVLNum = messageForRecordCount(6790);
+            MTLNum=String.valueOf(getLocalRecordsCount());
+        }
+        else if(centerName == "LVL"){
+            DDONum = messageForRecordCount(6789);
+            MTLNum = messageForRecordCount(6791);
+            LVLNum = String.valueOf(getLocalRecordsCount());
+        }
+        else{
+            MTLNum = messageForRecordCount(6791);
+            LVLNum = messageForRecordCount(6790);
+            DDONum=String.valueOf(getLocalRecordsCount());
+        }
+        //log
+        String log=(new Date().toString()+" - "+managerId+" - get records number ");
+        writeLog(log);
+
+        return "Records Count: DDO:"+DDONum+" | LVL:"+LVLNum+" | MTL:"+MTLNum;
     }
 
     @Override
-    public void editRecord(String managerId, String recordID, String fieldName, String newValue){
+    public boolean editRecord(String managerId, String recordID, String fieldName, String newValue){
         Record targetRecord=null;
 
         Collection<ArrayList<Record>> arrayListsSet=storedRecords.values();
@@ -74,6 +103,7 @@ public class CenterServerImp extends CenterServerPOA{
             for(Record record:recordArrayListSet){
                 if(record.recordID.equalsIgnoreCase(recordID))
                     targetRecord=record;
+                    break;
             }
         }
         if(targetRecord!=null){
@@ -81,23 +111,95 @@ public class CenterServerImp extends CenterServerPOA{
                 synchronized (targetRecord) {
                     ((TeacherRecord) targetRecord).setValue(fieldName, newValue);  //shared resource - synchronized
                 }
-                System.out.println(targetRecord);
             }
             else {
                 synchronized (targetRecord) {
                     ((StudentRecord) targetRecord).setValue(fieldName, newValue);   //shared resource - synchronized
                 }
-                System.out.println(targetRecord);
             }
+            //log
+            String log=(new Date().toString()+" - "+managerId+" - editing the record - "+recordID+" - Success");
+            writeLog(log);
+            return true;
         }
-        //log
-        String log=(new Date().toString()+" - "+managerId+" - editing a record - "+recordID);
-        writeLog(log);
+        else{
+            //log
+            String log=(new Date().toString()+" - "+managerId+" - editing the record - "+recordID+"- ERROR:Record not exist");
+            writeLog(log);
+            return false;
+        }
     }
 
     @Override
-    public void transferRecord(String managerId, String recordID, String remoteCenterServerName) {
+    public boolean transferRecord(String managerId, String recordID, String remoteCenterServerName) {
+        Record targetRecord=null;
 
+        Collection<ArrayList<Record>>arrayListsSet=storedRecords.values();
+        for(ArrayList<Record> recordArrayListSet : arrayListsSet){
+            for(Record record:recordArrayListSet){
+                if(record.recordID.equalsIgnoreCase(recordID))
+                    targetRecord=record;
+                break;
+            }
+        }
+        if(targetRecord==null){
+            //log
+            String log=(new Date().toString()+" - "+managerId+" - transferring the record - "+recordID+" - "+
+            "Error:record not exist");
+            writeLog(log);
+            return false;
+        }
+        else{
+            //remove
+            ArrayList<Record>theArrayList=storedRecords.get(targetRecord.lastName.charAt(0));
+            synchronized (targetRecord) {
+                theArrayList.remove(targetRecord);
+            }
+            //add
+            boolean flag;
+            if(remoteCenterServerName.equalsIgnoreCase("DDO"))
+                flag=messageForAddRecord(6789,targetRecord);
+            else if(remoteCenterServerName.equalsIgnoreCase("LVL"))
+                flag=messageForAddRecord(6790,targetRecord);
+            else if(remoteCenterServerName.equalsIgnoreCase("MTL"))
+                flag=messageForAddRecord(6791,targetRecord);
+            else
+                flag=false;
+            //log
+            if(flag){
+                String log=(new Date().toString()+" - "+managerId+" - transferring the record - "+recordID+" - "+
+                        "Success");
+                writeLog(log);
+            }
+            else{
+                String log=(new Date().toString()+" - "+managerId+" - transferring the record - "+recordID+" - "+
+                        "Fail");
+                writeLog(log);
+            }
+            return flag;
+        }
+    }
+
+
+    public boolean addTRecord(String recordID,String firstName, String lastName, String address, String phone, String specialization, String location) {
+        TeacherRecord teacherRecord = new TeacherRecord(recordID,firstName, lastName, address, phone, specialization, location);
+        int beforeNum=getLocalRecordsCount();
+        storingRecord(teacherRecord);
+        int afterNum=getLocalRecordsCount();
+        //log
+        String log=(new Date().toString()+" - "+" - [transfer]adding a teacher record - "+teacherRecord.recordID);
+        writeLog(log);
+        return beforeNum+1==afterNum;
+    }
+
+    public boolean addSRecord(String recordID, String firstName, String lastName, String coursesRegistered, String status, String date) {
+        StudentRecord studentRecord = new StudentRecord(recordID,firstName, lastName, coursesRegistered, status, date);
+        int beforeNum=getLocalRecordsCount();
+        storingRecord(studentRecord);
+        int afterNum=getLocalRecordsCount();
+        String log=(new Date().toString()+" - "+" - [transfer]adding a student record - "+studentRecord.recordID);
+        writeLog(log);
+        return beforeNum+1==afterNum;
     }
 
     //synchronized method:if two storingRecord execute concurrently,in the situation when hashMap does not include the key
@@ -143,4 +245,67 @@ public class CenterServerImp extends CenterServerPOA{
             e.printStackTrace();
         }
     }
+
+    private String messageForRecordCount(int port){
+        DatagramSocket datagramSocket = null;
+        try {
+            datagramSocket = new DatagramSocket();
+            byte[] message = "$COUNT".getBytes();
+            InetAddress host = InetAddress.getByName("localhost");
+
+            DatagramPacket request = new DatagramPacket(message,"$COUNT".length(),host, port);
+            datagramSocket.send(request);
+
+            //get message
+            byte[] buffer = new byte[1000];
+            DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
+            datagramSocket.receive(reply);
+            System.out.println(new String(reply.getData()));
+            return new String(reply.getData());
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }finally {
+            if(datagramSocket != null)
+                datagramSocket.close();
+        }
+        return "-1";
+    }
+
+    private boolean messageForAddRecord(int port,Record recordAdded){
+        DatagramSocket datagramSocket = null;
+        String messageString="$ADD,";
+        if(recordAdded instanceof StudentRecord)
+            messageString+=recordAdded.recordID+","+recordAdded.firstName+","+recordAdded.lastName+","+((StudentRecord) recordAdded).coursesRegistered
+                    +","+((StudentRecord) recordAdded).status+","+((StudentRecord) recordAdded).date;
+        else if(recordAdded instanceof TeacherRecord){
+            messageString+=recordAdded.recordID+","+recordAdded.firstName+","+recordAdded.lastName+","+((TeacherRecord) recordAdded).address
+                    +","+((TeacherRecord) recordAdded).phone+","+((TeacherRecord) recordAdded).specialization+","+((TeacherRecord) recordAdded).location;
+        }
+
+        try {
+            datagramSocket = new DatagramSocket();
+            byte[] message = messageString.getBytes();
+            InetAddress host = InetAddress.getByName("localhost");
+
+            DatagramPacket request = new DatagramPacket(message, message.length,host, port);
+            datagramSocket.send(request);
+
+            //get message
+            byte[] buffer = new byte[1000];
+            DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
+            datagramSocket.receive(reply);
+            String replyString=new String(reply.getData());
+            if(replyString.equalsIgnoreCase("SUCCESS"))
+                return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }finally {
+            if(datagramSocket != null)
+                datagramSocket.close();
+        }
+        return false;
+    }
+
+
 }

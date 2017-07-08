@@ -8,8 +8,10 @@ module DCMS{
 
          string  getRecordCounts(in string managerId);
 
-         void editRecord(in string managerId, in string recordID, in string fieldName, in string newValue);
+         boolean editRecord(in string managerId, in string recordID, in string fieldName, in string newValue);
 
-         void transferRecord(in string managerId, in string recordID, in string remoteCenterServerName);
+         boolean transferRecord(in string managerId, in string recordID, in string remoteCenterServerName);
+
+         oneway void shutdown();
     };
 };

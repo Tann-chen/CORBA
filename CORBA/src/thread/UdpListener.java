@@ -7,10 +7,12 @@ import java.net.DatagramSocket;
 
 public class UdpListener extends Thread{
 
-    CenterServerImp centerServerImp;
+    private CenterServerImp centerServerImp;
+    private int port;
 
-    public UdpListener(CenterServerImp centerServerImp){
+    public UdpListener(CenterServerImp centerServerImp,int portNumber){
         this.centerServerImp=centerServerImp;
+        this.port=portNumber;
     }
 
 
@@ -19,14 +21,15 @@ public class UdpListener extends Thread{
         DatagramSocket datagramSocket = null;
         try {
             //create belonging socket
-            datagramSocket = new DatagramSocket(6789);
+            datagramSocket = new DatagramSocket(port);
             byte[] buffer = new byte[1000];
             System.out.println(centerServerImp.centerName+"is ready to listen UDP requests between servers");
             //listening
             while(true){
                 DatagramPacket request = new DatagramPacket(buffer, buffer.length);
                 datagramSocket.receive(request);
-                new UdpHandler(request.getAddress(),request.getPort(),datagramSocket,centerServerImp).start();
+                String requestStrng=new String(request.getData());
+                    new UdpHandler(request.getAddress(),request.getPort(),datagramSocket,centerServerImp,requestStrng).start();
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
