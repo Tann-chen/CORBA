@@ -25,7 +25,7 @@ public class CenterServerImp extends CenterServerPOA{
     private HashMap<Character,ArrayList<Record>> storedRecords;
     private File loggingFile;
     private ORB orb;
-    private Semaphore mutex=new Semaphore(1,true);
+//    private Semaphore mutex=new Semaphore(1,true);
 
 
     public CenterServerImp(File loggingFile,String centerName){
