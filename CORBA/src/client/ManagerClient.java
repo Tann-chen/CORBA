@@ -35,7 +35,10 @@ public class ManagerClient {
 		Manager manager3=new Manager("LVL1111");
 		manager3.createSRecord("chen3","C","French","active","2008-10-04");
 		manager3.getRecordCounts();
+		manager3.transferRecord("SR10001", "DDO");
 		System.out.println("manager3 running");
+		
+		
 
 	}
 }

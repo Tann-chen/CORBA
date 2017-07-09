@@ -272,6 +272,7 @@ public class CenterServerImp extends CenterServerPOA{
     }
 
     private boolean messageForAddRecord(int port,Record recordAdded){
+    	boolean flag = false;
         DatagramSocket datagramSocket = null;
         String messageString="$ADD,";
         if(recordAdded instanceof StudentRecord)
@@ -281,7 +282,7 @@ public class CenterServerImp extends CenterServerPOA{
             messageString+=recordAdded.recordID+","+recordAdded.firstName+","+recordAdded.lastName+","+((TeacherRecord) recordAdded).address
                     +","+((TeacherRecord) recordAdded).phone+","+((TeacherRecord) recordAdded).specialization+","+((TeacherRecord) recordAdded).location;
         }
-
+        
         try {
             datagramSocket = new DatagramSocket();
             byte[] message = messageString.getBytes();
@@ -294,16 +295,22 @@ public class CenterServerImp extends CenterServerPOA{
             byte[] buffer = new byte[1000];
             DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
             datagramSocket.receive(reply);
-            String replyString=new String(reply.getData());
-            if(replyString.equalsIgnoreCase("SUCCESS"))
-                return true;
+            String replyString=new String(reply.getData()).trim();
+//            System.out.println(new String(reply.getData()));
+//            System.out.println(replyString);
+            if(replyString.equals("SUCCESS")){
+              System.out.println("2222");
+            	flag = true;
+            }
+               
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }finally {
             if(datagramSocket != null)
                 datagramSocket.close();
         }
-        return false;
+//        System.out.println(flag);
+        return flag;
     }
 
 
