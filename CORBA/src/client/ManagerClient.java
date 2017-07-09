@@ -9,6 +9,7 @@ public class ManagerClient {
 
 
 	public static void main(String[] args){
+		System.out.print("running");
 		try{
 			ORB orb = ORB.init(args, null);
 			org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
@@ -30,5 +31,9 @@ public class ManagerClient {
 		Manager manager3=new Manager("LVL1111");
 		manager3.createSRecord("chen3","C","French","active","2008-10-04");
 		manager3.getRecordCounts();
+
+		manager1.shutdown();
+		manager2.shutdown();
+		manager3.shutdown();
 	}
 }

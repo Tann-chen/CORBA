@@ -86,6 +86,10 @@ public class Manager{
 		writelog(log);
 	}
 
+	public void shutdown(){
+		this.centerServerImp.shutdown();
+	}
+
 	private static void writelog(String log){
 		try {
 			synchronized (loggingFile) {
