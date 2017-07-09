@@ -25,7 +25,7 @@ public class UdpHandler extends Thread{
 	@Override
 	public void run() {
 		byte[] message;
-		if(operation.equalsIgnoreCase("$COUNT")){
+		if(operation.startsWith("$COUNT")){
 			int num = centerServerImp.getLocalRecordsCount();
 			message = String.valueOf(num).getBytes();
 		}
