@@ -7,6 +7,7 @@ import org.omg.CosNaming.NamingContextExtHelper;
 
 public class ManagerClient {
 
+
 	public static void main(String[] args){
 		try{
 			ORB orb = ORB.init(args, null);
@@ -29,6 +30,5 @@ public class ManagerClient {
 		Manager manager3=new Manager("LVL1111");
 		manager3.createSRecord("chen3","C","French","active","2008-10-04");
 		manager3.getRecordCounts();
-
 	}
 }
