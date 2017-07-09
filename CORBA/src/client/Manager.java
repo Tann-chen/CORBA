@@ -1,124 +1,102 @@
 package client;
 
-
-
+import DCMS.CenterServer;
+import DCMS.CenterServerHelper;
+import org.omg.CosNaming.NamingContextExt;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.Date;
 
-
-import org.omg.CORBA.ORB;
-import org.omg.CosNaming.NamingContextExt;
-import org.omg.CosNaming.NamingContextExtHelper;
-
-
-public class Manager {
+public class Manager{
 	private String managerID;
-	private String name;
-	private Registry registry;
-
+	private CenterServer centerServerImp;
 	private static File loggingFile=new File("Manager.txt");
 
-	public Manager(String managerID, String name, String[] args){
+	private static NamingContextExt ncRef;
+
+	public Manager(String managerID){
 		this.managerID = managerID;
-		this.name = name;
-		//distributing server
-
-		String nameService;
-		if(this.managerID.startsWith("MTL")){
-			nameService="MTL";
-		}
-		else if(this.managerID.startsWith("LVL")){
-			nameService="LVL";
-		}
-		else if(this.managerID.startsWith("DDO")){
-			nameService="DDO";
-		}
-		else{
-			System.out.println("Error:invalid managerID");
-			return;
-		}
-
 		try{
-	        // create and initialize the ORB
-	        ORB orb = ORB.init(args, null);
-	         // get the root naming context
-	        org.omg.CORBA.Object objRef =
-	            orb.resolve_initial_references(nameService);
-	        // Use NamingContextExt instead of NamingContext. This is
-	        // part of the Interoperable naming Service.
-	        NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
-	        // resolve the Object Reference in Naming
-	        String message = "Hello";
-	        helloImpl = HelloHelper.narrow(ncRef.resolve_str(message));
-	         System.out.println("Obtained a handle on server object: " + helloImpl);
-	        System.out.println(helloImpl.sayHello());
-//	        helloImpl.shutdown();
-	         } catch (Exception e) {
-	          System.out.println("ERROR : " + e) ;
-	          e.printStackTrace(System.out);
-	          }
+			// resolve the Object Reference in Naming
+			String name = managerID.substring(0,3);
+			centerServerImp = CenterServerHelper.narrow(ncRef.resolve_str(name));
+		} catch (Exception e) {
+			System.out.println("ERROR : " + e) ;
+			e.printStackTrace(System.out);
+		}
+	}
+
+	public static void setNamingContextExt(NamingContextExt namingContextExt){
+		Manager.ncRef=namingContextExt;
 	}
 
 	public void createTRecord(String firstName, String lastName, String address, String phone, String specialization, String location){
-		boolean flag=false;
-		try {
-			flag=centerServer.createTRecord(firstName, lastName, address, phone, specialization, location);
-		}catch (RemoteException re){
-			re.getStackTrace();
-		}
-		String log=(new Date().toString())+" | "+this.name + "- create teacher record - "+ String.valueOf(flag);
+		boolean flag;
+		flag=centerServerImp.createTRecord(managerID,firstName, lastName, address, phone, specialization, location);
+		//log
+		String log;
+		if(flag)
+			log=(new Date().toString())+" - "+managerID+ "- create teacher record - Success";
+		else
+			log=(new Date().toString())+" - "+managerID+ "- create teacher record - Fail";
 		writelog(log);
 	}
 
 	public void createSRecord(String firstName, String lastName, String coursesRegistered, String status, String date){
-		boolean flag=false;
-		try{
-			flag=centerServer.createSRecord(firstName, lastName, coursesRegistered, status, date);
-		}catch (RemoteException re) {
-			re.getStackTrace();
-		}
-		String log=(new Date().toString())+" | "+this.name + "- create student record - "+ flag;
+		boolean flag;
+		flag=centerServerImp.createSRecord(managerID,firstName, lastName, coursesRegistered, status, date);
+		String log;
+		if(flag)
+			 log=(new Date().toString())+" - "+managerID+ "- create student record - Success";
+		else
+			log=(new Date().toString())+" - "+managerID+ "- create student record - Fail";
 		writelog(log);
 	}
 
-	public void getRecordCounts() throws RemoteException {
-			String result=null;
-		try{
-			result=centerServer.getRecordCounts();
-		}catch (RemoteException re){
-			re.getStackTrace();
-		}
-		String log=(new Date().toString())+" | "+this.name + "- get records count - "+ result;
+	public void getRecordCounts(){
+		String result;
+		result=centerServerImp.getRecordCounts(managerID);
+		String log=(new Date().toString())+" - "+managerID+ " - get records count - result:"+ result;
 		writelog(log);
-		System.out.println(result);
 	}
 
-	public void editRecord(String recordID, String fieldName, String newValue) throws RemoteException {
-		try {
-			centerServer.editRecord(recordID, fieldName, newValue);
-		}catch (RemoteException re){
-			re.getStackTrace();
-		}
-		String log=(new Date().toString())+" | "+this.name + "- edit record - ";
+	public void editRecord(String recordID, String fieldName, String newValue){
+		boolean flag;
+		flag=centerServerImp.editRecord(managerID,recordID, fieldName, newValue);
+		//log
+		String log;
+		if(flag)
+		 	log=(new Date().toString())+" - "+managerID+ "- edit record - "+recordID+" - Success";
+		else
+			log=(new Date().toString())+" - "+managerID+ "- edit record - "+recordID+" - Fail";
+		writelog(log);
+	}
+
+	public void transferRecord(String recordID, String remoteCenterServerName){
+		boolean flag;
+		flag=centerServerImp.transferRecord(managerID,recordID,remoteCenterServerName);
+		//log
+		String log;
+		if(flag)
+			log=(new Date().toString())+" - "+managerID+ "- transfer record - "+recordID+" - Success";
+		else
+			log=(new Date().toString())+" - "+managerID+ "- transfer record - "+recordID+" - Fail";
 		writelog(log);
 	}
 
 	private static void writelog(String log){
 		try {
-			FileWriter fileWriter = new FileWriter(loggingFile, true);
-			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-			bufferedWriter.write(log);
-			bufferedWriter.newLine();
-			bufferedWriter.close();
+			synchronized (loggingFile) {
+				FileWriter fileWriter = new FileWriter(loggingFile, true);
+				BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+				bufferedWriter.write(log);
+				bufferedWriter.newLine();
+				bufferedWriter.close();
+			}
 		}catch (IOException e){
 			e.printStackTrace();
 		}
 	}
-
 }

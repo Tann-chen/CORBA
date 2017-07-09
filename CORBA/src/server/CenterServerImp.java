@@ -233,14 +233,13 @@ public class CenterServerImp extends CenterServerPOA{
         if(!loggingFile.exists())
             return;
         try {
-            FileWriter fileWriter = new FileWriter(loggingFile, true);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            //loggingFile is shared resource
             synchronized (loggingFile) {
+                FileWriter fileWriter = new FileWriter(loggingFile, true);
+                BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
                 bufferedWriter.write(log);
                 bufferedWriter.newLine();
+                bufferedWriter.close();
             }
-            bufferedWriter.close();
         }catch (IOException e){
             e.printStackTrace();
         }
