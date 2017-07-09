@@ -18,17 +18,7 @@ public class TeacherRecord extends Record implements Serializable{
 		this.specialization = specialization;
 		this.location = location;
 	}
-
-	public TeacherRecord(String recordId,String firstName, String lastName, String address, String phone, String specialization,
-						 String location) {
-		super(firstName,lastName);
-		this.recordID=recordId;
-		this.address = address;
-		this.phone = phone;
-		this.specialization = specialization;
-		this.location = location;
-	}
-
+	
 	public boolean setValue(String fieldName, String value){
 		if(fieldName.equalsIgnoreCase("location")){
 			if(value.equals("mtl")||value.equals("lvl")||value.equals("ddo")){

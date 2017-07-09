@@ -181,8 +181,8 @@ public class CenterServerImp extends CenterServerPOA{
     }
 
 
-    public boolean addTRecord(String recordID,String firstName, String lastName, String address, String phone, String specialization, String location) {
-        TeacherRecord teacherRecord = new TeacherRecord(recordID,firstName, lastName, address, phone, specialization, location);
+    public boolean addTRecord(String firstName, String lastName, String address, String phone, String specialization, String location) {
+        TeacherRecord teacherRecord = new TeacherRecord(firstName, lastName, address, phone, specialization, location);
         int beforeNum=getLocalRecordsCount();
         storingRecord(teacherRecord);
         int afterNum=getLocalRecordsCount();
@@ -192,8 +192,8 @@ public class CenterServerImp extends CenterServerPOA{
         return beforeNum+1==afterNum;
     }
 
-    public boolean addSRecord(String recordID, String firstName, String lastName, String coursesRegistered, String status, String date) {
-        StudentRecord studentRecord = new StudentRecord(recordID,firstName, lastName, coursesRegistered, status, date);
+    public boolean addSRecord(String firstName, String lastName, String coursesRegistered, String status, String date) {
+        StudentRecord studentRecord = new StudentRecord(firstName, lastName, coursesRegistered, status, date);
         int beforeNum=getLocalRecordsCount();
         storingRecord(studentRecord);
         int afterNum=getLocalRecordsCount();
@@ -299,7 +299,6 @@ public class CenterServerImp extends CenterServerPOA{
 //            System.out.println(new String(reply.getData()));
 //            System.out.println(replyString);
             if(replyString.equals("SUCCESS")){
-              System.out.println("2222");
             	flag = true;
             }
                
@@ -309,7 +308,6 @@ public class CenterServerImp extends CenterServerPOA{
             if(datagramSocket != null)
                 datagramSocket.close();
         }
-//        System.out.println(flag);
         return flag;
     }
 

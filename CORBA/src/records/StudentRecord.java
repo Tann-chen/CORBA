@@ -18,16 +18,6 @@ public class StudentRecord extends Record implements Serializable{
 		this.date = date;
 	}
 
-	public StudentRecord(String recordID,String firstName, String lastName, String coursesRegistered, String status, String date){
-		super(firstName,lastName);
-		this.recordID=recordID;
-		this.coursesRegistered = coursesRegistered;
-		this.status = status;
-		this.date = date;
-	}
-
-
-
 	public boolean setValue(String fieldName, String value){
 		if(fieldName.equalsIgnoreCase("status")){
 			if(value.equals("active")||value.equals("inactive")){
