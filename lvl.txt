@@ -1,2 +1,0 @@
-Sun Jul 09 10:29:23 EDT 2017 - LVL1111 - creating a student record - SR10001
-Sun Jul 09 10:29:23 EDT 2017 - LVL1111 - get records number 
