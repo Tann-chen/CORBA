@@ -26,6 +26,7 @@ public class CenterServerImp extends CenterServerPOA{
     private ORB orb;
 
 
+
     public CenterServerImp(File loggingFile,String centerName){
         storedRecords= new HashMap<Character,ArrayList<Record>>();
         this.loggingFile=loggingFile;
@@ -42,7 +43,8 @@ public class CenterServerImp extends CenterServerPOA{
     }
 
     @Override
-    public synchronized boolean createTRecord(String managerId, String firstName, String lastName, String address, String phone, String specialization, String location) {
+
+    public  boolean  createTRecord(String managerId, String firstName, String lastName, String address, String phone, String specialization, String location) {
         TeacherRecord teacherRecord = new TeacherRecord(firstName, lastName, address, phone, specialization, location);
         int beforeNum=getLocalRecordsCount();
 
@@ -52,19 +54,19 @@ public class CenterServerImp extends CenterServerPOA{
         //log
         String log=(new Date().toString()+" - "+managerId+" - creating a teacher record - "+teacherRecord.recordID);
         writeLog(log);
-        return beforeNum+1==afterNum;
+        return beforeNum+1<=afterNum;
     }
 
 
     @Override
-    public boolean createSRecord(String managerId, String firstName, String lastName, String coursesRegistered, String status, String date) {
+    public  boolean createSRecord(String managerId, String firstName, String lastName, String coursesRegistered, String status, String date) {
         StudentRecord studentRecord = new StudentRecord(firstName, lastName, coursesRegistered, status, date);
         int beforeNum=getLocalRecordsCount();
         storingRecord(studentRecord);
         int afterNum=getLocalRecordsCount();
         String log=(new Date().toString()+" - "+managerId+" - creating a student record - "+studentRecord.recordID);
         writeLog(log);
-        return beforeNum+1==afterNum;
+        return beforeNum+1<=afterNum;
     }
 
     @Override
