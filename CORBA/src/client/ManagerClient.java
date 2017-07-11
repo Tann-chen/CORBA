@@ -30,21 +30,22 @@ public class ManagerClient {
 		int user_input;
 
 		do {
-			System.out.print("==="+managerID+"=== \n"
+			System.out.println("==="+managerID+"=== \n"
 					+"1.Create Teacher Record  \n"
 					+"2.Create Student Record\n"
 					+"3.Get Record Count \n"
 					+"4.Editing Record  \n"
 					+"5.Transfer Record  \n"
 					+"6.Switch managerID \n"
-					+"0.Quit \n"
+					+"7.Switch managerID \n"
+					+"0.Quit"
 					);
 			input= new Scanner(System.in);
 			String responseLine = input.nextLine();
 			user_input = Integer.parseInt(responseLine.trim());
 
 			boolean result;
-			// githun sb 
+			// githun sb
 			switch (user_input) {
 				case 1:{
 					System.out.println("Enter: firstName lastName address phone specialization location(mtl,lvl,do) ");
@@ -108,6 +109,11 @@ public class ManagerClient {
 					input=new Scanner(System.in);
 					managerID = input.nextLine();
 					themanager=new Manager(managerID);
+				}
+				case 7:{
+					System.out.println("Enter: recordID");
+					String recordID = input.next();
+					System.out.println(themanager.getRecordInfo(recordID));
 				}
 				case 0:
 					break;

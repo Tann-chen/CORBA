@@ -91,6 +91,10 @@ public class Manager{
 		return flag;
 	}
 
+	public String getRecordInfo(String recordID){
+		return centerServerImp.getRecordInfo(recordID);
+	}
+
 	public void shutdown(){
 		this.centerServerImp.shutdown();
 	}

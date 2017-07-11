@@ -182,6 +182,24 @@ public class CenterServerImp extends CenterServerPOA{
         }
     }
 
+    @Override
+    public String getRecordInfo(String recordID) {
+        Record targetRecord=null;
+
+        Collection<ArrayList<Record>> arrayListsSet=storedRecords.values();
+        for(ArrayList<Record> recordArrayListSet:arrayListsSet){
+            for(Record record:recordArrayListSet){
+                if(record.recordID.equalsIgnoreCase(recordID))
+                    targetRecord=record;
+                break;
+            }
+        }
+        if(targetRecord!=null)
+            return targetRecord.toString();
+        else
+            return "the record is not exist";
+
+    }
 
     public boolean addTRecord(String firstName, String lastName, String address, String phone, String specialization, String location) {
         TeacherRecord teacherRecord = new TeacherRecord(firstName, lastName, address, phone, specialization, location);
