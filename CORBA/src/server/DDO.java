@@ -21,7 +21,7 @@ public class DDO {
 			// setup the logging file
 			logFile = new File("ddo.txt");
 			// create and initialize the ORB
-			ORB orb = ORB.init(args, null);
+			ORB orb = ORB.init(new String[]{"-ORBInitialHost", "localhost", "-ORBInitialPort", "1050"}, null);
 			// get reference to rootpoa & activate the POAManager
 			POA rootpoa = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
 			rootpoa.the_POAManager().activate();

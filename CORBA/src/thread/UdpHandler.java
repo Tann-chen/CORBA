@@ -33,9 +33,9 @@ public class UdpHandler extends Thread{
 			boolean flag;
 			String[] temp=operation.split(",");
 			if(temp[1].startsWith("TR"))
-				flag=centerServerImp.addTRecord(temp[1],temp[2],temp[3],temp[4],temp[5],temp[6],temp[7]);
+				flag=centerServerImp.addTRecord(temp[2],temp[3],temp[4],temp[5],temp[6],temp[7]);
 			else if(temp[1].startsWith("SR"))
-				flag=centerServerImp.addSRecord(temp[1],temp[2],temp[3],temp[4],temp[5],temp[6]);
+				flag=centerServerImp.addSRecord(temp[2],temp[3],temp[4],temp[5],temp[6]);
 			else
 				flag=false;
 

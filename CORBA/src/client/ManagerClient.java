@@ -5,13 +5,13 @@ import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
 
+import java.util.Scanner;
+
 public class ManagerClient {
 
-
 	public static void main(String[] args){
-
 		try{
-			ORB orb = ORB.init(args, null);
+			ORB orb = ORB.init(new String[]{"-ORBInitialHost", "localhost", "-ORBInitialPort", "1050"}, null);
 			org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
 			NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
 			//setup the NamingContextExt inside the Manager
@@ -21,24 +21,84 @@ public class ManagerClient {
 			e.printStackTrace(System.out);
 		}
 
-		new ClientThread().start();
+		String managerID;
+		System.out.print("Enter Manager ID: ");
+		Scanner input = new Scanner(System.in);
+		managerID = input.nextLine();
+		Manager themanager=new Manager(managerID);
 
-		Manager manager1=new Manager("MTL1111");
-		manager1.createSRecord("chen1","A","Math","active","2008-10-02");
-		manager1.getRecordCounts();
-		System.out.println("manager1 running");
+		int user_input;
 
-		Manager manager2=new Manager("DDO1111");
-		manager2.createSRecord("chen2","B","English","active","2008-10-03");
-		System.out.println("manager2 running");
+		do {
+			System.out.print("==="+managerID+"=== \n"
+					+"1.Create Teacher Record  \n"
+					+"2.Create Student Record\n"
+					+"3.Get Record Count \n"
+					+"4.Editing Record  \n"
+					+"5.Transfer Record  \n"
+					+"6.Switch managerID \n"
+					+"0.Quit \n"
+					);
+			input= new Scanner(System.in);
+			String responseLine = input.nextLine();
+			user_input = Integer.parseInt(responseLine.trim());
 
-		Manager manager3=new Manager("LVL1111");
-		manager3.createSRecord("chen3","C","French","active","2008-10-04");
-		manager3.getRecordCounts();
-		manager3.transferRecord("SR10001", "DDO");
-		System.out.println("manager3 running");
-		
-		
+			String result;
 
+			switch (user_input) {
+				case 1:{
+					System.out.println("Enter: firstName lastName address phone specialization location(mtl,lvl,do) ");
+					String firstName = input.next();
+					String lastName = input.next();
+					String address = input.next();
+					String phone = input.next();
+					String specialization = input.next();
+					String location = input.next();
+					themanager.createTRecord(firstName,lastName, address, phone, specialization, location);
+
+					break;
+				}
+				case 2: {
+					System.out.println("Enter:firstName lastName courseRegistered status statusDate");
+					String firstName = input.next();
+					String lastName = input.next();
+					String courseRegistered = input.next();
+					String status = input.next();
+					String statusDate = input.next();
+					themanager.createSRecord(firstName, lastName, courseRegistered, status, statusDate);
+					break;
+				}
+				case 3:{
+					themanager.getRecordCounts();
+					break;
+				}
+				case 4:{
+					System.out.println("Enter:recordID fieldName newValue");
+					String recordID = input.next();
+					String fieldName = input.next();
+					String newValue = input.next();
+					themanager.editRecord(recordID, fieldName, newValue);
+					break;
+				}
+				case 5: {
+					System.out.println("Enter:record ID destinationLocation");
+					String recordID = input.next();
+					String destinationLocation = input.next();
+					themanager.transferRecord(recordID, destinationLocation);
+					break;
+				}
+				case 6:{
+					System.out.println("Enter: new managerID");
+					input=new Scanner(System.in);
+					managerID = input.nextLine();
+					themanager=new Manager(managerID);
+				}
+				case 0:
+					break;
+				default:
+					System.out.println("wrong input!!!!!");
+			}
+
+		} while (user_input != 0);
 	}
 }

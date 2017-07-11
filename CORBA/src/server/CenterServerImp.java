@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.concurrent.Semaphore;
 
 
 public class CenterServerImp extends CenterServerPOA{
@@ -25,7 +24,6 @@ public class CenterServerImp extends CenterServerPOA{
     private HashMap<Character,ArrayList<Record>> storedRecords;
     private File loggingFile;
     private ORB orb;
-    private Semaphore mutex=new Semaphore(1,true);
 
 
     public CenterServerImp(File loggingFile,String centerName){
@@ -44,10 +42,12 @@ public class CenterServerImp extends CenterServerPOA{
     }
 
     @Override
-    public boolean createTRecord(String managerId, String firstName, String lastName, String address, String phone, String specialization, String location) {
+    public synchronized boolean createTRecord(String managerId, String firstName, String lastName, String address, String phone, String specialization, String location) {
         TeacherRecord teacherRecord = new TeacherRecord(firstName, lastName, address, phone, specialization, location);
         int beforeNum=getLocalRecordsCount();
+
         storingRecord(teacherRecord);
+        //
         int afterNum=getLocalRecordsCount();
         //log
         String log=(new Date().toString()+" - "+managerId+" - creating a teacher record - "+teacherRecord.recordID);
