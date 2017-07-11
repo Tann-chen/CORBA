@@ -32,7 +32,7 @@ public class Manager{
 		Manager.ncRef=namingContextExt;
 	}
 
-	public void createTRecord(String firstName, String lastName, String address, String phone, String specialization, String location){
+	public boolean createTRecord(String firstName, String lastName, String address, String phone, String specialization, String location){
 		boolean flag;
 		flag=centerServerImp.createTRecord(managerID,firstName, lastName, address, phone, specialization, location);
 		//log
@@ -42,9 +42,10 @@ public class Manager{
 		else
 			log=(new Date().toString())+" - "+managerID+ "- create teacher record - Fail";
 		writelog(log);
+		return flag;
 	}
 
-	public void createSRecord(String firstName, String lastName, String coursesRegistered, String status, String date){
+	public boolean createSRecord(String firstName, String lastName, String coursesRegistered, String status, String date){
 		boolean flag;
 		flag=centerServerImp.createSRecord(managerID,firstName, lastName, coursesRegistered, status, date);
 		String log;
@@ -53,16 +54,18 @@ public class Manager{
 		else
 			log=(new Date().toString())+" - "+managerID+ "- create student record - Fail";
 		writelog(log);
+		return flag;
 	}
 
-	public void getRecordCounts(){
+	public String getRecordCounts(){
 		String result;
 		result=centerServerImp.getRecordCounts(managerID);
 		String log=(new Date().toString())+" - "+managerID+ " - get records count - result:"+ result;
 		writelog(log);
+		return result;
 	}
 
-	public void editRecord(String recordID, String fieldName, String newValue){
+	public boolean editRecord(String recordID, String fieldName, String newValue){
 		boolean flag;
 		flag=centerServerImp.editRecord(managerID,recordID, fieldName, newValue);
 		//log
@@ -72,9 +75,10 @@ public class Manager{
 		else
 			log=(new Date().toString())+" - "+managerID+ "- edit record - "+recordID+" - Fail";
 		writelog(log);
+		return flag;
 	}
 
-	public void transferRecord(String recordID, String remoteCenterServerName){
+	public boolean transferRecord(String recordID, String remoteCenterServerName){
 		boolean flag;
 		flag=centerServerImp.transferRecord(managerID,recordID,remoteCenterServerName);
 		//log
@@ -84,6 +88,7 @@ public class Manager{
 		else
 			log=(new Date().toString())+" - "+managerID+ "- transfer record - "+recordID+" - Fail";
 		writelog(log);
+		return flag;
 	}
 
 	public void shutdown(){

@@ -43,7 +43,7 @@ public class ManagerClient {
 			String responseLine = input.nextLine();
 			user_input = Integer.parseInt(responseLine.trim());
 
-			String result;
+			boolean result;
 
 			switch (user_input) {
 				case 1:{
@@ -54,8 +54,11 @@ public class ManagerClient {
 					String phone = input.next();
 					String specialization = input.next();
 					String location = input.next();
-					themanager.createTRecord(firstName,lastName, address, phone, specialization, location);
-
+					result=themanager.createTRecord(firstName,lastName, address, phone, specialization, location);
+					if(result)
+						System.out.println("Success");
+					else
+						System.out.println("Fail");
 					break;
 				}
 				case 2: {
@@ -65,11 +68,16 @@ public class ManagerClient {
 					String courseRegistered = input.next();
 					String status = input.next();
 					String statusDate = input.next();
-					themanager.createSRecord(firstName, lastName, courseRegistered, status, statusDate);
+					result=themanager.createSRecord(firstName, lastName, courseRegistered, status, statusDate);
+					if(result)
+						System.out.println("Success");
+					else
+						System.out.println("Fail");
 					break;
 				}
 				case 3:{
-					themanager.getRecordCounts();
+					String consequence=themanager.getRecordCounts();
+					System.out.println(consequence);
 					break;
 				}
 				case 4:{
@@ -77,14 +85,22 @@ public class ManagerClient {
 					String recordID = input.next();
 					String fieldName = input.next();
 					String newValue = input.next();
-					themanager.editRecord(recordID, fieldName, newValue);
+					result=themanager.editRecord(recordID, fieldName, newValue);
+					if(result)
+						System.out.println("Success");
+					else
+						System.out.println("Fail");
 					break;
 				}
 				case 5: {
 					System.out.println("Enter:record ID destinationLocation");
 					String recordID = input.next();
 					String destinationLocation = input.next();
-					themanager.transferRecord(recordID, destinationLocation);
+					result=themanager.transferRecord(recordID, destinationLocation);
+					if(result)
+						System.out.println("Success");
+					else
+						System.out.println("Fail");
 					break;
 				}
 				case 6:{
