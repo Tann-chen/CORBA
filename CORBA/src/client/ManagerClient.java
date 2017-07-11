@@ -37,7 +37,7 @@ public class ManagerClient {
 					+"4.Editing Record  \n"
 					+"5.Transfer Record  \n"
 					+"6.Switch managerID \n"
-					+"7.Switch managerID \n"
+					+"7.Get record info \n"
 					+"0.Quit"
 					);
 			input= new Scanner(System.in);
